@@ -1,8 +1,6 @@
 from redshift_connector import connect, Connection, error
 from redcopy.utils import get_ddl, data_io
-import logging
-
-logging.basicConfig(level=logging.INFO)
+from . import logger
 
 
 def get_table_list(connection: Connection):
@@ -14,28 +12,28 @@ def get_table_list(connection: Connection):
         """)
     tables = tables_cur.fetchall()
     tables_cur.close()
-    logging.info(f'{len(tables)} tables found')
+    logger.info(f'{len(tables)} tables found')
     return tables
 
 
 def get_src_ddl(connection: Connection):
-    logging.info(f'Fetching table DDL')
+    logger.info(f'Fetching table DDL')
     tables = get_ddl.get_table_ddl(connection=connection)
-    logging.info(f'DDL for {len(tables)} tables extracted')
+    logger.info(f'DDL for {len(tables)} tables extracted')
     return tables
 
 
 def execute_ddl(connection: Connection, ddl: dict):
-    logging.info('Executing DDL on destination')
+    logger.info('Executing DDL on destination')
     connection.autocommit = True
     for table, ddl in ddl.items():
-        logging.info(f'Running DDL for {table}')
+        logger.info(f'Running DDL for {table}')
         cur = connection.cursor()
         try:
             cur.execute(ddl)
-            logging.info(f'{table} created')
+            logger.info(f'{table} created')
         except error.ProgrammingError as e:
-            logging.error(e)
+            logger.error(e)
             connection.rollback()
         cur.close()
 

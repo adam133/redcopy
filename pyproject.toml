@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = "redcopy"
-version = "0.0.1"
+version = "0.0.4"
 description = "A simple Python library for easily making a copy of a Redshift Database."
 authors = [
     { name = "Adam Best", email = "besta2010@gmail.com" },
@@ -34,6 +34,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 urls = { repository = "https://github.com/adam133/redcopy" }
+dependencies = [
+    'redshift-connector <3, >=2',
+]
 
 [tool.maturin]
 bindings = "bin"

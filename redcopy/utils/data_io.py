@@ -1,18 +1,15 @@
 from redshift_connector import Connection, error
-from redcopy import core
-import logging
-
-logging.basicConfig(level=logging.INFO)
+from redcopy import core, logger
 
 
 def unload_tables_to_s3(connection: Connection, iam_role_arn: str, s3_path: str):
     # ensure s3_path ends with a /
     assert s3_path[-1] == '/'
     tables = core.get_table_list(connection=connection)
-    logging.info(f'Unloading to s3 path: {s3_path}')
+    logger.info(f'Unloading to s3 path: {s3_path}')
     connection.autocommit = True
     for table_schema, table_name in tables:
-        logging.info(f'Unloading table {table_schema}.{table_name}')
+        logger.info(f'Unloading table {table_schema}.{table_name}')
         unload_cur = connection.cursor()
         unload_sql = f"""
         unload ('select * from {table_schema}.{table_name}')
@@ -27,10 +24,10 @@ def load_tables_from_s3(connection: Connection, iam_role_arn: str, s3_path: str)
     # ensure s3_path ends with a /
     assert s3_path[-1] == '/'
     tables = core.get_table_list(connection=connection)
-    logging.info(f'Loading tables from s3 path: {s3_path}')
+    logger.info(f'Loading tables from s3 path: {s3_path}')
 
     for table_schema, table_name in tables:
-        logging.info(f'Loading table {table_schema}.{table_name}')
+        logger.info(f'Loading table {table_schema}.{table_name}')
         load_cur = connection.cursor()
         load_sql = f"""
         copy {table_schema}.{table_name}
@@ -40,6 +37,6 @@ def load_tables_from_s3(connection: Connection, iam_role_arn: str, s3_path: str)
         try:
             load_cur.execute(load_sql)
         except error.ProgrammingError as e:
-            logging.error(e)
+            logger.error(e)
             connection.rollback()
         load_cur.close()
