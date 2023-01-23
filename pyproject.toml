@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = "redcopy"
-version = "0.0.4"
+version = "0.0.5"
 description = "A simple Python library for easily making a copy of a Redshift Database."
 authors = [
     { name = "Adam Best", email = "besta2010@gmail.com" },

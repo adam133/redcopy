@@ -25,6 +25,7 @@ def load_tables_from_s3(connection: Connection, iam_role_arn: str, s3_path: str)
     assert s3_path[-1] == '/'
     tables = core.get_table_list(connection=connection)
     logger.info(f'Loading tables from s3 path: {s3_path}')
+    connection.autocommit = True
 
     for table_schema, table_name in tables:
         logger.info(f'Loading table {table_schema}.{table_name}')
