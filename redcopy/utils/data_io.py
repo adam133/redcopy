@@ -41,3 +41,25 @@ def load_tables_from_s3(connection: Connection, iam_role_arn: str, s3_path: str)
             logger.error(e)
             connection.rollback()
         load_cur.close()
+
+
+def load_tables_insert_select_cross_db(connection: Connection,
+                                       src_db: str,
+                                       target_db: str):
+    tables = core.get_table_list(connection=connection)
+    logger.info(f'Loading tables with cross-db insert/select from {src_db} to {target_db}')
+    connection.autocommit = True
+
+    for table_schema, table_name in tables:
+        logger.info(f'Loading table {table_schema}.{table_name}')
+        load_cur = connection.cursor()
+        load_sql = f"""
+        insert into {target_db}.{table_schema}.{table_name}
+        select * from {src_db}.{table_schema}/{table_name}
+        """
+        try:
+            load_cur.execute(load_sql)
+        except error.ProgrammingError as e:
+            logger.error(e)
+            connection.rollback()
+        load_cur.close()

@@ -48,3 +48,9 @@ def load_target(connection: Connection, iam_role_arn: str, s3_path: str):
     data_io.load_tables_from_s3(connection=connection,
                                 iam_role_arn=iam_role_arn,
                                 s3_path=s3_path)
+
+
+def load_cross_db(connection: Connection, src_db: str, target_db: str):
+    data_io.load_tables_insert_select_cross_db(connection=connection,
+                                               src_db=src_db,
+                                               target_db=target_db)

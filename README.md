@@ -51,7 +51,7 @@ core.load_target(connection=dest,
 ## Future work:
 
 - Add automated tests
-- Copy data using cross-database queries on ra3 instances
+- ~~Copy data using cross-database queries on ra3 instances~~
 - Add schema DDL to extract
 - Add user grants to extract
 - Add view DDL to extract
