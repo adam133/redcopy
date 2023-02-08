@@ -14,7 +14,7 @@ def unload_tables_to_s3(connection: Connection, iam_role_arn: str, s3_path: str)
         unload_sql = f"""
         unload ('select * from {table_schema}.{table_name}')
         to '{s3_path}{table_schema}/{table_name}/' iam_role '{iam_role_arn}'
-        parquet manifest allowoverwrite
+        parquet manifest allowoverwrite maxfilesize 300 MB
         """
         unload_cur.execute(unload_sql)
         unload_cur.close()
@@ -37,6 +37,7 @@ def load_tables_from_s3(connection: Connection, iam_role_arn: str, s3_path: str)
         """
         try:
             load_cur.execute(load_sql)
+            connection.commit()
         except error.ProgrammingError as e:
             logger.error(e)
             connection.rollback()
@@ -55,7 +56,7 @@ def load_tables_insert_select_cross_db(connection: Connection,
         load_cur = connection.cursor()
         load_sql = f"""
         insert into {target_db}.{table_schema}.{table_name}
-        select * from {src_db}.{table_schema}/{table_name}
+        select * from {src_db}.{table_schema}.{table_name}
         """
         try:
             load_cur.execute(load_sql)
